@@ -604,7 +604,7 @@ dat %>%
 
 # Descriptive Statistics of Moderators
 
-We chose a set of moderators that frequently appear in the literature and may help us interpret our results. We included them in our meta-regressions alongside an indicator for the type of independent variable used in the original study ($n$, log($n$), or $k$). The additional moderators are: electoral system; estimation method; publication year; paper publication in an academic journal. 
+We chose a set of moderators that frequently appear in the literature and may help us interpret our results. We included them in our meta-regressions alongside an indicator for the type of independent variable used in the original study: lower chamber size ($n$), natural logarithm of lower chamber size (log[$n$]), or upper chamber size ($k$). The additional moderators are: the publication year; whether the paper was published in an academic journal; the estimation method used in the paper; the insitution design in terms of the division of legislative power; and the electoral system. 
 
 ```{r, warning=F, message=F, echo = FALSE, cache=TRUE, results='asis'}
 fulldat$usemeta2 <- factor(fulldat$usemeta)
@@ -632,15 +632,15 @@ export2md(descrTable(~.-usemeta2, aux, y = aux$usemeta2,
 
 # Binomial Tests for Coefficient Signs
 
-The *law of 1/n* posits that we should expect a positive influence of legislature size on public expenditures. A general test of the theory could investigate whether the papers tend to find a higher frequency of positive coefficients in their estimations. In statistical terms, consider a random variable representing the coefficient sign for the papers. As each sign of the paper is a Bernoulli trial, the aggregate result for all papers follows a Binomial distribution with parameters $n$ equals the number of papers, and $p$ the chance of a positive sign. The *law of 1/n* can be reformulated as the chance of $p>0.5$, which facilitates the testing of the theory. The null hypothesis for such a test is that:
+The *law of 1/n* posits that we should expect a positive influence of legislature size on public expenditures. A general test of the theory could investigate whether the papers tend to find a higher frequency of positive coefficients in their estimations. In statistical terms, consider a random variable representing the coefficient sign for the papers. As each sign of the paper is a Bernoulli trial, the aggregate result for all papers follows a Binomial distribution with parameters $n$ equals the number of papers, and $p$ the chance of a positive sign. The *law of 1/n* can be reformulated as the chance of $p>0.5$, which facilitates the testing of the theory. The null statistical hypothesis for such a test is that:
 
--   $H_0$: the proportion of positive and negative signs are statistically equal ($p=0.5$).
+- $H_0$: the proportion of positive and negative signs are statistically equal ($p=0.5$).
 
-As we are taking an agnostic approach, we acknowledge that either the *law of 1/n* ($p>0.5$), or the *reverse law of 1/n* ($p<0.5$) may be true. In this case, the alternative hypothesis is $p\neq 0.5$. To perform this test, we run binomial tests in `R`, using the function `binom.test(.)`.
+As we are taking an agnostic approach, we acknowledge that either the *law of 1/n* ($p>0.5$), or the *reverse law of 1/n* ($p<0.5$) may be true. In this case, the alternative hypothesis is $p \neq 0.5$. To perform this test, we run binomial exact tests in `R`, using the function `binom.test(.)`.
 
 This test has two advantages. First, it is robust to the design of the paper. This is an important feature as papers analyse different countries, samples, and have distinct characteristics, such as whether they were published or not. The binomial test ignores the design discrepancies and focuses on the overall reported effect. Second, this test has the advantages of requiring few assumptions and being easy to interpret. The disadvantage is that the test is not as informative as the meta-regressions, as we shall see in the next sections.
 
-For the number of legislators in the lower house ($N$), the results follow below.
+For the number of legislators in the lower chamber ($N$), the results follow below.
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 aux <- filter(dat, indepvar2 == "N")
@@ -650,7 +650,7 @@ pander(tidy(aux2)[,-c(2,4,5,6)][,c(3,4,1,2)])
 
 Under the null hypothesis of $p=0.5$, we find that `r as.numeric(table(aux$scoef)[2])` out of `r sum(table(aux$scoef))` studies have a positive sign. The chance of a distribution with $p=0.5$ generate this sample is equal to p-value = `r round(as.numeric(aux2$p.value), 3)`. Thus, we `r ifelse(as.numeric(aux2$p.value)<0.1, 'accept', 'reject')` the hypothesis that $p \neq 0.5$.
 
-For the log of the number of legislators in the lower house ($\log(N)$), the results are as follows:
+For the log of the number of legislators in the lower chamber ($\log(N)$), the results are as follows:
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 aux <- filter(dat, indepvar2 == "logN")
@@ -660,7 +660,7 @@ pander(tidy(aux2)[,-c(2,4,5,6)][,c(3,4,1,2)])
 
 Out of `r sum(table(aux$scoef))` studies, `r as.numeric(table(aux$scoef)[2])` have a positive sign. The chance of a distribution with $p=0.5$ generate this sample is equal to p-value = `r round(as.numeric(aux2$p.value), 3)`. So we `r ifelse(as.numeric(aux2$p.value)<0.1, 'accept', 'reject')` the hypothesis that $p \neq 0.5$.
 
-Finally, for the number of legislators in the upper house ($K$), the results are:
+Finally, for the number of legislators in the upper chamber ($K$), the results are:
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 aux <- filter(dat, indepvar2=='K')
@@ -670,7 +670,7 @@ pander(tidy(aux2)[,-c(2,4,5,6)][,c(3,4,1,2)])
 
 Here we see that `r as.numeric(table(aux$scoef)[2])` out of `r sum(table(aux$scoef))` studies have a positive sign. The p-value for this test is `r round(as.numeric(aux2$p.value), 3)`. Therefore, we `r ifelse(as.numeric(aux2$p.value)<0.1, 'accept', 'reject')` the hypothesis that $p \neq 0.5$. This is the only test that presents evidence of an association between the legislature size and expenditure.
 
-We also tested the possibility that the signs change heterogeneously, based on whether the paper studied unicameral versus non-unicameral legislative bodies. This analysis does not take into consideration the size of the upper house, as it would indicate that the cases in the paper had trivially a non-unicameral legislature. The results in the Table XXXX, show that there is no significant change controlling by this variable. 
+We also tested the possibility that the signs change heterogeneously, based on whether the paper studied unicameral versus non-unicameral legislative bodies. This analysis does not take into consideration the size of the upper house, as it would indicate that the cases in the paper had trivially a non-unicameral legislature. The results for this analysis follow below, and show that there is no significant change in the sign of the relationship between public spending and legislature size, when controlling by the institution design. 
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 aux <- list()
@@ -711,7 +711,7 @@ In this paper, we employ a random effects model. The empirical papers testing th
 2.  **Electoral systems**: Majoritarian, PR, Mixed.
 3.  **Modelling strategies**: Panel data, Standard OLS, IV, RDD.
 
-These sources of heterogeneity have two implications. First, they make our estimates notably disperse. Second, the amount of heterogeneity makes fixed effects estimates unrealistic and biased. Thus, we opt for random effects model.
+These sources of heterogeneity have two implications. First, they make our estimates notably disperse. Second, the amount of heterogeneity makes fixed effects estimates unrealistic and biased. Thus, we opt for the random effects model.
 
 Assume that each study has an effect of $T_i$. In a random effects model, we can decompose this effect into two components, the true effect that the study with the same specifications as $i$ comes from, $\theta_i$, and a within-study error $\varepsilon_i$:
 
@@ -727,7 +727,7 @@ $$
 
 And the random effects model estimates the parameter $\mu$, under the challenge of estimating both the within-and-between-study sampling errors.
 
-Another crucial assumption in meta-analysis is that the coefficients should be independent [@harrer2019doing; @cheung2019guide; @veroniki2016methods; @borenstein2011introduction]. This assumption states that for our findings to be consistent, the coefficients must come from different sources of variation. However, in the political economy literature, authors frequently use similar datasets, and almost all papers fit more than one model with similar variables. While our restricted dataset contains `r nrow(dat)` estimates, our full dataset has `r nrow(fulldat)` coefficients. This is because the papers report an average of `r round(mean(as.numeric(table(fulldat$id))), 2)` coefficients. To correct for the violation of the independent assumption, we use a multilevel random effects model [@cheung2014modeling]. We add two extra levels to the regular random effects model, one that indicates the publication ID and another that indicates the data used in the original article. These levels are assumed to remove dependence structures in the data, therefore improving the estimates of our coefficient of interest, which is the effect of legislature size on public spending.
+Another crucial assumption in meta-analysis is that the coefficients should be independent [@harrer2019doing; @cheung2019guide; @veroniki2016methods; @borenstein2011introduction]. This assumption states that for our findings to be consistent, the coefficients must come from different sources of variation. However, in the political economy literature, authors frequently use similar datasets, and almost all papers fit more than one model with similar variables. While our restricted dataset contains `r nrow(dat)` estimates, our full dataset has `r nrow(fulldat)` coefficients. This is because the papers report an average of `r round(mean(as.numeric(table(fulldat$id))), 2)` coefficients. To correct for the violation of the study independence assumption, we use a multilevel random effects model [@cheung2014modeling]. We add two extra levels to the regular random effects model, one that indicates the publication ID and another that indicates the data used in the original article. These levels are assumed to remove dependence structures in the data, therefore improving the estimates of our coefficient of interest, which is the effect of legislature size on public spending.
 
 There are two levels in the main models. First, we build a common index for papers that share the same data specifications. The papers with common indexing are:
 
@@ -737,13 +737,13 @@ There are two levels in the main models. First, we build a common index for pape
 | 408, 208, A258                              | US Municipalities Data                                                   |
 | 849, 578                                    | US Municipalities Data and Same Author in Two Different Studies          |
 
-All the remaining papers received a unique index. As the number of the papers with these dependencies is not very high, and many characteristics within papers vary (e. g., state-wise ad-hoc exclusions, start and end points variations, region selection, etc), we show that it makes little difference to change from this index to the paper IDs. In regard to the full dataset, the results change considerably, because authors fit several models within the same paper. In any case, we use multilevel random effects for all the estimated models in this paper.
+All the remaining papers received a unique index. As the number of papers with these dependencies is not very high, and many characteristics within papers vary (e. g., state-wise ad-hoc exclusions, start and end points variations, region selection, etc), we show that it makes little difference to change from this index to the paper IDs. In regard to the full dataset, the results change considerably, because authors fit several models within the same paper. In any case, we use multilevel random effects for all the estimated models in this paper.
 
-To study the possibility of of publication bias, we add a funnel plot and an @egger1997bias test for distribution asymmetry for every model. Funnel plots display the possibility of having a file-drawer effect, meaning that null results are under-represented in our sample. In this type of plot, under the assumption of no file-drawer effect, the coefficients are expected to lie symmetrically around the mean observed outcome. If they are asymmetric, it provides evidence for a file-drawer effect.
+To study the possibility of publication bias, we add a funnel plot and an @egger1997bias test for distribution asymmetry for every model. Funnel plots display the possibility of having a file-drawer effect, meaning that null results are under-represented in our sample. In this type of plot, under the assumption of no file-drawer effect, the coefficients are expected to lie symmetrically around the mean observed outcome. If they are asymmetric, it provides evidence for a file-drawer effect.
 
 We use the `R` packages `meta` and `dmetar` in all estimates [@harrer2019doing]. We employ the *Restricted Maximum Likelihood Estimator* to assess the variance of the true effect size ($\tau^2$), which in our formulation represents the variance of $\xi_i$. The literature regards this estimator as the most precise when analysing continuous measures, such as the ones we have in our data [@veroniki2016methods].
 
-We combine the three independent variables ($n$, $\log(n)$, and $k$) with our dependent variables of interest (Expenditure Per Capita, Log of Expenditure Per Capita, Expenditure as a Percentage of the GDP). This formed a $3 \times 3$ table, yet not all combinations are available in the data. The results are shown below.
+We combine the three independent variables (Lower Chamber Size, Log of Lower Chamber Size, and Upper Chamber Size) with our dependent variables of interest (Expenditure Per Capita, Log of Expenditure Per Capita, Expenditure as a Percentage of the GDP). This formed a $3 \times 3$ table, yet not all combinations are available in the data. The results are shown below.
 
 ## Lower House Size and Expenditure per Capita
 
@@ -834,7 +834,7 @@ funnel(mod)
 
 
 ```{r, include=FALSE, warning=FALSE, echo = FALSE}
-f2 <- build_forest(mod, NULL, 15, ttl = 'Upper House Size\nand Expenditure Per Capita')
+f2 <- build_forest(mod, NULL, 15, ttl = 'Upper Chamber Size\nand Expenditure Per Capita')
 ```
 
 Highlights:
@@ -878,7 +878,7 @@ funnel(mod)
 
 
 ```{r,include=F, echo = FALSE, warning=F, cache=TRUE}
-f3 <- build_forest(mod, NULL, 15, ttl = 'Lower House Size\nand Log Expenditure Per Capita')
+f3 <- build_forest(mod, NULL, 15, ttl = 'Lower Chamber Size\nand Log Expenditure Per Capita')
 ```
 
 Highlights:
@@ -921,7 +921,7 @@ funnel(mod)
 
 
 ```{r,include=F, echo = FALSE, warning=F, cache=TRUE}
-f4  <- build_forest(mod, NULL, 15, ttl = 'Log of Lower House Size\nand Log of Expenditure Per Capita')
+f4  <- build_forest(mod, NULL, 15, ttl = 'Log of Lower Chamber Size\nand Log of Expenditure Per Capita')
 ```
 
 Highlights:
@@ -967,7 +967,7 @@ funnel(mod)
 ```
 
 ```{r, include=F, warning=F, echo = FALSE, cache=TRUE}
-f5 <- build_forest(mod, NULL, 15, ttl = 'Lower House Size\nand Expenditure as Percentage of GDP')
+f5 <- build_forest(mod, NULL, 15, ttl = 'Lower Chamber Size\nand Expenditure as Percentage of GDP')
 ```
 
 Highlights:
@@ -979,7 +979,7 @@ Highlights:
 
 ## Log Lower House Size and Expenditure as Percentage of GDP
 
-This model investigates the percentage of GDP as public expenditure as the dependent variable and the log lower house size (logN) as the treatment variable.
+This model investigates the percentage of GDP as public expenditure as the dependent variable and the log lower house size as the treatment variable.
 
 ```{r, echo = FALSE, size="footnotesize", cache=TRUE}
 # Pooling effects analysis -- PCTGDP x logN
@@ -1009,7 +1009,7 @@ funnel(mod)
 
 
 ```{r, include=F, warning=F, cache=TRUE, echo = FALSE}
-f6 <- build_forest(mod, NULL, 15, ttl = 'Log Lower House Size\nand Expenditure as Percentage of GDP')
+f6 <- build_forest(mod, NULL, 15, ttl = 'Log Lower Chamber Size\nand Expenditure as Percentage of GDP')
 ```
 
 Highlights:
@@ -1050,7 +1050,7 @@ funnel(mod)
 
 
 ```{r, include=F, warning=F, cache=TRUE, echo = FALSE}
-f7 <- build_forest(mod, NULL, 15, ttl = 'Upper House Size\nand Expenditure as Percentage of GDP')
+f7 <- build_forest(mod, NULL, 15, ttl = 'Upper Chamber Size\nand Expenditure as Percentage of GDP')
 ```
 
 Highlights:
@@ -1086,7 +1086,7 @@ And the forest plot:
 build_forest(mod, NULL)
 ```
 
-No evidence of publication bias, as shown in the following tunnel plot:
+No evidence of publication bias, as shown in the following funnel plot:
 
 ```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
@@ -1108,7 +1108,7 @@ mod <- rma.mv(coef, VAR, data=aux,
 f8 <- build_forest_het(aux, aux$coef, 
                        aux$VAR, slab = aux$authoryear,
                        capt = NULL, lsize = 15, 
-                       ttl = 'Lower House Size and Expenditure per Capita\n(subgrouping by the estimation technique)', 
+                       ttl = 'Lower Chamber Size and Expenditure per Capita\n(subgrouping by the estimation technique)', 
                        hetvar = aux$method)
 ```
 
@@ -1181,7 +1181,7 @@ mod <- rma.mv(coef, VAR, data=aux,
           method = "REML")
 
 f9 <- build_forest(mod, capt = NULL, 
-                       lsize = 15, ttl = 'Lower House Size and Log of Expenditure per Capita\n(subgrouping by RDD)')
+                       lsize = 15, ttl = 'Lower Chamber Size and Log of Expenditure per Capita\n(subgrouping by RDD)')
 ```
 
 Highlights:
@@ -1190,6 +1190,7 @@ Highlights:
 2.  The estimated SMD in the random effects model is $g =$ `r round(predict(mod)$pred,2)` ($SE =$ `r round(predict(mod)$se,3)`).
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
+5. One notable absence in the analysis is the seminar paper by @petterssonlidbom2012size. The reason is because in that paper, the author uses log of Expenditure Per Capita x Log of Legislature Size.
 
 ```{r, warning=F, cache=TRUE, echo = FALSE, results='hide'}
 ## Plot 1
