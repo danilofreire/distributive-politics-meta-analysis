@@ -400,7 +400,7 @@ paper.
 \raggedright Author(s) & \centering Journal & \centering Country & \centering Dependent Variable & \centering Method & \centering Institutional Design & \centering Electoral System
 \tabularnewline
 \midrule
-\endhead 
+\endhead
 ```{r papers, echo = FALSE, results = 'asis', cache = T}
 build_nams <- function(x) {
   x_ <- unlist(strsplit(as.character(x), ' & ', fixed = T, useBytes = T))
@@ -418,7 +418,7 @@ build_nams <- function(x) {
                    sep = ''))
 }
 aux <- dat %>%
-  select(authoryear, journalCode, locationISO, depvar2, method, instdesign2, elecsys3, year) %>%
+  select(authoryear, journalCode, locationISO, depvar2, method, instdesign, elecsys3, year) %>%
   unique() %>%
   arrange(year, depvar2)
 aux2 <- aux %>%
@@ -437,7 +437,7 @@ aux <- aux2
 for (i in 1:dim(aux)[1]) {
   cat(paste(build_nams(aux$authoryear[i]), ' & ', aux$journalCode[i], ' & ',
       aux$locationISO[i], ' & ', aux$depvar2[i], ' & ', 
-      aux$method[i], ' & ', aux$instdesign2[i], ' & ', 
+      aux$method[i], ' & ', aux$instdesign[i], ' & ', 
       aux$elecsys3[i], ' \\\\ [0.5ex]', sep = ''), '\n')
 }
 ```
@@ -514,13 +514,21 @@ variables.
 fulldat$usemeta2 <- factor(fulldat$usemeta)
 levels(fulldat$usemeta2) <- c("Other coefficients", "Main sample")
 aux <- select(fulldat, usemeta2, indepvar2, elecsys2, method,
-              year, published, instdesign2) %>%
+              year, published, instdesign) %>%
   rename(`Independent Variables` = indepvar2,
          `Year`                  = year,
          `Published work`        = published,
          `Estimation method`     = method,
-         `Institutional Design`  = instdesign2,
+         `Institutional Design`  = instdesign,
          `Electoral system`      = elecsys2)
+aux$`Independent Variables` <- recode(aux$`Independent Variables`,
+                                      `N` = "Lower Chamber Size",
+                                      `K` = "Upper Chamber Size",
+                                      `logN` = "Log of Lower Chamber Size")
+aux$`Electoral system` <- recode(aux$`Electoral system`,
+                                 `Non-Maj` = "Non-Majoritarian",
+                                 `Maj` = "Majoritarian")
+aux <- select(aux, usemeta2, `Independent Variables`, Year, `Published work`, `Estimation method`, `Institutional Design`, `Electoral system`)
 
 export2md(descrTable(~.-usemeta2, aux, y = aux$usemeta2,
                         show.p.overall = F, show.all = T),
@@ -945,6 +953,7 @@ extract_coefs <- function(mod, modnam) {
              "Method: Panel",
              "Method: IV",
              "Method: RDD",
+             "Legislature: Mixed",
              "Legislature: Unicameral"), 
              nams2 = c("intrcpt", 
                        "indepvar2logN", 
@@ -955,11 +964,30 @@ extract_coefs <- function(mod, modnam) {
                        "methodPANEL", 
                        "methodIV", 
                        "methodRDD",
-                       "instdesign2Unicameral"))
+                       "instdesignMixed",
+                       "instdesignUnicameral"))
   dfr <- left_join(aux, dfr) %>%
     mutate_if(is.numeric, list(~round(., digits = 4)))
   dfr$nams2 <- NULL
   return(dfr)
+}
+
+gcf <- function(mod, pos) {
+  x <- mod$est[pos]
+  y <- mod$pval[pos]
+  if(!is.na(x)) {
+    return(paste0(round(x, digits = 3), strep(y)))
+  } else {
+    return('')
+  }
+}
+gcf2 <- function(mod, pos) {
+  x <- mod$se[pos]
+  if(!is.na(x)) {
+    return(paste0('(', round(x, digits = 3), ')'))
+  } else {
+    return('')
+  }
 }
 
 # Expenditure per capita - Restricted
@@ -967,7 +995,7 @@ mod <-  rma(yi = coef,
               sei = SE,
               data = dat,
               method = "REML",
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
             subset = dat$depvar2=='ExpPC',
             slab = dat$authoryear,
@@ -980,7 +1008,7 @@ mod <- rma(yi = coef,
               sei = SE,
               data = fulldat,
               method = "REML",
-              mods = ~ ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~ ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
             subset = fulldat$depvar2=='ExpPC',
             slab = fulldat$authoryear)
@@ -992,7 +1020,7 @@ mod <- rma(yi = coef,
               sei = SE,
               data = dat,
               method = "REML",
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
             subset = dat$depvar2=='logExpPC',
             slab = dat$authoryear)
@@ -1004,7 +1032,7 @@ mod <- rma(yi = coef,
               sei = SE,
               data = fulldat,
               method = "REML",
-              mods = ~ ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~ ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
             subset = fulldat$depvar2=='logExpPC',
             slab = fulldat$authoryear)
@@ -1017,7 +1045,7 @@ mod <-  rma.mv(yi = coef,
               data = dat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               sparse = TRUE,
               tdist = TRUE,
@@ -1031,7 +1059,7 @@ mod <- rma(yi = coef,
               sei = SE,
               data = fulldat,
               method = "REML",
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
             subset = fulldat$depvar2=='PCTGDP',
             slab = fulldat$authoryear)
@@ -1043,7 +1071,7 @@ mod <- rma.mv(yi = coef,
               data = dat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
@@ -1056,31 +1084,13 @@ mod <- rma.mv(yi = coef,
               data = fulldat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
               slab = fulldat$authoryear)
 
 res[[8]] <- extract_coefs(mod, "Full Model - All coefs")
-gcf <- function(mod, pos) {
-  x <- mod$est[pos]
-  y <- mod$pval[pos]
-  if(!is.na(x)) {
-    return(paste0(round(x, digits = 3), strep(y)))
-  } else {
-    return('')
-  }
-}
-gcf2 <- function(mod, pos) {
-  # round(res[[3]][2,3],3)`)`r strep(res[[3]][2,5])`
-  x <- mod$se[pos]
-  if(!is.na(x)) {
-    return(paste0('(', round(x, digits = 3), ')'))
-  } else {
-    return('')
-  }
-}
 ```
 
 \vspace{0.5cm}
@@ -1088,31 +1098,31 @@ gcf2 <- function(mod, pos) {
 ```{=latex}
 \begin{table}[htpb]
 \caption{Meta Regression Results\label{tabregressions}}
-\footnotesize
+\scriptsize
 \centering
 \begin{tabular}{lcccccccc}
 \toprule
 \midrule
-\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Expenditure Per Capita} & \multicolumn{2}{c}{Log Expenditure Per Capita} & \multicolumn{2}{c}{Gov. Spending \% GDP} & \multicolumn{2}{c}{Full Model} \\
+\multicolumn{1}{c}{ } & \multicolumn{2}{c}{Expenditure Per Capita} & \multicolumn{2}{c}{Log Expenditure Per Capita} & \multicolumn{2}{c}{Gov. Spending \% GDP} & \multicolumn{2}{c}{All Coefficients} \\
 \cmidrule(l{3pt}r{3pt}){2-3} \cmidrule(l{3pt}r{3pt}){4-5} \cmidrule(l{3pt}r{3pt}){6-7} \cmidrule(l{3pt}r{3pt}){8-9}
 & Restricted & Extended & Restricted & Extended & Restricted & Extended & Restricted & Extended \\
 \midrule
-Independent Variable: log($N$) & 
+Log of Lower Chamber Size & 
 `r gcf(res[[1]], 2)` & `r gcf(res[[2]], 2)` & 
 `r gcf(res[[3]], 2)` & `r gcf(res[[4]], 2)` & 
 `r gcf(res[[5]], 2)` & `r gcf(res[[6]], 2)` &
 `r gcf(res[[7]], 2)` & `r gcf(res[[8]], 2)` \\
-& `r gcf2(res[[1]], 2)` & `r gcf2(res[[2]], 2)` & 
+ & `r gcf2(res[[1]], 2)` & `r gcf2(res[[2]], 2)` & 
 `r gcf2(res[[3]], 2)` & `r gcf2(res[[4]], 2)` & 
 `r gcf2(res[[5]], 2)` & `r gcf2(res[[6]], 2)` & 
 `r gcf2(res[[7]], 2)` & `r gcf2(res[[8]], 2)` \\
 %
-Independent Variable: $N$ &
+Lower Chamber Size &
 `r gcf(res[[1]], 3)` & `r gcf(res[[2]], 3)` & 
 `r gcf(res[[3]], 3)` & `r gcf(res[[4]], 3)` & 
 `r gcf(res[[5]], 3)` & `r gcf(res[[6]], 3)` &
 `r gcf(res[[7]], 3)` & `r gcf(res[[8]], 3)` \\
-& `r gcf2(res[[1]], 3)` & `r gcf2(res[[2]], 3)` & 
+ & `r gcf2(res[[1]], 3)` & `r gcf2(res[[2]], 3)` & 
 `r gcf2(res[[3]], 3)` & `r gcf2(res[[4]], 3)` & 
 `r gcf2(res[[5]], 3)` & `r gcf2(res[[6]], 3)` & 
 `r gcf2(res[[7]], 3)` & `r gcf2(res[[8]], 3)` \\
@@ -1127,7 +1137,7 @@ Year &
 `r gcf2(res[[5]], 4)` & `r gcf2(res[[6]], 4)` & 
 `r gcf2(res[[7]], 4)` & `r gcf2(res[[8]], 4)` \\
 %
-Non-Majoritarian (PR \& Mixed) & 
+Non-Majoritarian & 
 `r gcf(res[[1]], 5)` & `r gcf(res[[2]], 5)` & 
 `r gcf(res[[3]], 5)` & `r gcf(res[[4]], 5)` & 
 `r gcf(res[[5]], 5)` & `r gcf(res[[6]], 5)` &
@@ -1177,7 +1187,7 @@ Method: RDD &
 `r gcf2(res[[5]], 9)` & `r gcf2(res[[6]], 9)` & 
 `r gcf2(res[[7]], 9)` & `r gcf2(res[[8]], 9)` \\
 % 
-Inst.: Unicameral & 
+Inst. Design: Mixed & 
 `r gcf(res[[1]], 10)` & `r gcf(res[[2]], 10)` & 
 `r gcf(res[[3]], 10)` & `r gcf(res[[4]], 10)` & 
 `r gcf(res[[5]], 10)` & `r gcf(res[[6]], 10)` &
@@ -1186,6 +1196,16 @@ Inst.: Unicameral &
 `r gcf2(res[[3]], 10)` & `r gcf2(res[[4]], 10)` & 
 `r gcf2(res[[5]], 10)` & `r gcf2(res[[6]], 10)` & 
 `r gcf2(res[[7]], 10)` & `r gcf2(res[[8]], 10)` \\
+% 
+Inst. Design: Unicameral & 
+`r gcf(res[[1]], 11)` & `r gcf(res[[2]], 11)` & 
+`r gcf(res[[3]], 11)` & `r gcf(res[[4]], 11)` & 
+`r gcf(res[[5]], 11)` & `r gcf(res[[6]], 11)` &
+`r gcf(res[[7]], 11)` & `r gcf(res[[8]], 11)` \\
+& `r gcf2(res[[1]], 11)` & `r gcf2(res[[2]], 11)` & 
+`r gcf2(res[[3]], 11)` & `r gcf2(res[[4]], 11)` & 
+`r gcf2(res[[5]], 11)` & `r gcf2(res[[6]], 11)` & 
+`r gcf2(res[[7]], 11)` & `r gcf2(res[[8]], 11)` \\
 % 
 Intercept & 
 `r gcf(res[[1]], 1)` & `r gcf(res[[2]], 1)` & 
@@ -1200,7 +1220,7 @@ Intercept &
 \end{tabular}
 \begin{minipage}{\textwidth}
 \renewcommand{\footnoterule}{}
-\footnotetext{\textbf{Note:} {The restricted and extended samples include `r length(dat$id)` and `r length(fulldat$id)` study coefficients, respectively. We report the results from the permutation tests. Reference categories: Independent Variable: Upper House Size; Published $= No$; Non-Majoritarian; Method $= OLS$, Legislative: $= Non-Unicameral$. Significance codes: *** $p < 0.01$; ** $p < 0.05$; * $p < 0.10$.}}
+\footnotetext{\textbf{Note:} {The restricted and extended samples include `r length(dat$id)` and `r length(fulldat$id)` study coefficients, respectively. We report the results from the permutation tests. Reference categories: Independent Variable: Upper House Size; Published $= No$; Non-Majoritarian; Method $= OLS$, Inst. Design $= Bicameral$. Significance codes: *** $p < 0.01$; ** $p < 0.05$; * $p < 0.10$. Blank cells mean that there is no sufficient data to estimate the paramater.}}
 \end{minipage}
 \end{table}
 ```
