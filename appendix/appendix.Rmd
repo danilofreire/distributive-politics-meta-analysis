@@ -337,7 +337,7 @@ curve(xstar(x, beta = 0.35, theta = 0.5), from = 10, to = 20,
       main = 'Decreasing project size when varying legislature size \n (low deadweight losses)', xlab = 'Legislature Size', ylab = 'Project Size')
 ```
 
-Thus, we see that both the _law of 1/n_ and its reverse formulation are equally plausible. Here we show how the results change just by changing the levels of deadweight losses, but authors have suggested other reasons why the _law of 1/n_ may not apply, such as bicameralism [@chen_malhotra_2007], popular initiatives [@matsusaka2005endogeneity], type of government [@coate2011government], supermajorities [@lee2015supermajority], political fragmentation [@lledo2003electoral], and ideology [@bjedov2014impact]. 
+Thus, we see that both the _law of 1/n_ and its reverse formulation are equally plausible. Here we show how the results change just by changing the levels of deadweight losses, but authors have suggested other reasons why the _law of 1/n_ may not apply, such as bicameralism [@chen2007law], popular initiatives [@matsusaka2005endogeneity], type of government [@coate2011government], supermajorities [@lee2015supermajority], political fragmentation [@lledo2003electoral], and ideology [@bjedov2014impact]. 
 
 # Search Criteria
 
@@ -367,19 +367,19 @@ articles.
 
 ## Exclusion Analysis
 
-We selected the final pool of articles based on two criteria, namely the treatment and the outcome variables employed in the paper. The categories follow below: 
+We selected the final pool of articles based on two criteria, namely the independent and the dependent variables employed in the paper. The categories follow below: 
 
-1.  Treatment variables:
+1.  Independent variables:
 
 -   *N*: Number Legislators in the Lower Chamber
 -   *logN*: Log Number Legislators in the Lower Chamber
 -   *K*: Number Legislators in the Upper Chamber
 
-2.  Outcome variables:
+2.  Dependent variables:
 
 -   *ExpPC*: Expenditure Per Capita
 -   *logExpPC*: Log Expenditure Per Capita
--   *PCTGDP*: Percent GDP Public Expenditure
+-   *PCTGDP*: Expenditure as Percentage of GDP
 
 If a paper did not use a combination of these variables, we excluded it from the meta-analysis.
 
@@ -498,7 +498,7 @@ dat %>%
   unique() %>%
   ggplot(aes(x = as.factor(published))) +
     geom_bar(color = "black") +
-  labs(x = "Published Study?",
+  labs(x = "",
        y = "") +
   theme_bw()
 ```
@@ -513,27 +513,27 @@ dat %>%
   unique() %>%
   ggplot(aes(x=as.factor(elecsys2))) +
     geom_bar(color = "black") +
-  labs(x = "Electoral Systems",
+  labs(x = "",
        y = "") +
   theme_bw()
 ```
 
 ## Dependent Variables
 
-The outcome variables included in the paper are:
+The dependent variables included in the paper are:
 
--   `r as.numeric(table(unique(select(dat, id, depvar2))$depvar2)[1])` Per Capita Expenditure papers
+-   `r as.numeric(table(unique(select(dat, id, depvar2))$depvar2)[1])` Expenditure Per Capita papers
 -   `r as.numeric(table(unique(select(dat, id, depvar2))$depvar2)[2])` Expenditure as a Percentage of the GDP papers
--   `r as.numeric(table(unique(select(dat, id, depvar2))$depvar2)[3])` Natural Log of Per Capita Expenditure papers
+-   `r as.numeric(table(unique(select(dat, id, depvar2))$depvar2)[3])` Log of Expenditure Per Capita papers
 
 ```{r, fig.width=6, fig.height=2.3, fig.cap="Dependent variables across the law of 1/n studies", size="footnotesize", cache=TRUE, echo = FALSE}
 dat %>%
   select(id, depvar2) %>%
   unique() %>%
   mutate(depvar2 = factor(depvar2,
-                          labels = c("Per Capita Expenditure",
-                                     "Percentage GDP Public Expenditure",
-                                     "Log Per Capita Expenditure"))) %>%
+                          labels = c("Expenditure Per Capita",
+                                     "Expenditure as Percentage GDP",
+                                     "Log Expenditure Per Capita"))) %>%
   ggplot(aes(x = depvar2)) +
     geom_bar(color = "black") +
   labs(x = "",
@@ -710,6 +710,7 @@ In this paper, we employ a random effects model. The empirical papers testing th
 1.  **Study sample**: Counties, Municipalities, States, Provinces, Countries.
 2.  **Electoral systems**: Majoritarian, PR, Mixed.
 3.  **Modelling strategies**: Panel data, Standard OLS, IV, RDD.
+4.  **Institution design**: Unicameral, Bicameral, or the Mixed of both Unicameral and Bicameral.
 
 These sources of heterogeneity have two implications. First, they make our estimates notably disperse. Second, the amount of heterogeneity makes fixed effects estimates unrealistic and biased. Thus, we opt for the random effects model.
 
@@ -745,9 +746,9 @@ We use the `R` packages `meta` and `dmetar` in all estimates [@harrer2019doing].
 
 We combine the three independent variables (Lower Chamber Size, Log of Lower Chamber Size, and Upper Chamber Size) with our dependent variables of interest (Expenditure Per Capita, Log of Expenditure Per Capita, Expenditure as a Percentage of the GDP). This formed a $3 \times 3$ table, yet not all combinations are available in the data. The results are shown below.
 
-## Lower House Size and Expenditure per Capita
+## Lower Chamber Size and Expenditure Per Capita
 
-The results for the meta-analysis that compares lower house size (_n_) and expenditure per capita are available below.
+The results for the meta-analysis that compares lower chamber size and expenditure per capita are available below.
 
 ```{r, cache=TRUE, echo = FALSE, size="footnotesize"}
 # Pooling effects analysis -- ExpPC x N
@@ -767,17 +768,17 @@ mod
 
 The forest plot:
 
-```{r, fig.width=8, fig.height=4.5, fig.cap="Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=4.5, fig.cap="Effect of Lower Chamber Size on Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 ```{r,include=F, warning=F, cache=TRUE, echo = FALSE}
-f1 <- build_forest(mod, NULL, lsize = 15, ttl = 'Lower House Size\nand Expenditure per Capita')
+f1 <- build_forest(mod, NULL, lsize = 15, ttl = '1.1 - Lower Chamber Size\nand Expenditure Per Capita')
 ```
 
 And to assess the possibility of publication bias, we add the funnel plot below:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Lower House Size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -794,18 +795,29 @@ The *law of 1/n* was introduced to describe majoritarian systems, but the theory
 
 We find little evidence that either majoritarian or non-majoritarian systems produce systematically positive effects on expenditure per capita. Both coefficients are not statistically significant, and they reassure us that the absence of effect is not caused by pooling multiple types of electoral systems.
 
-```{r, fig.width=8, fig.height=6, fig.cap="Subgroup Analysis of Lower House Size x Expenditure Per Capita, controlling by Electoral System", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=6, fig.cap="Subgroup Analysis of Lower Chamber Size x Expenditure Per Capita, Controlling by Electoral System", warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest_het(aux, aux$coef, aux$VAR, slab = aux$authoryear,
                  capt = NULL, hetvar = aux$elecsys2)
 ```
 
-## Log of Lower House Size and Expenditure per Capita
+### Institution Design Subgroup Analysis
 
-There are no studies that have per capita expenditure as the dependent variable and log of lower house size as the treatment variable.
+The *law of 1/n* was conceived to explain the expected relationship that XXXX when increasing the chamber size. However, papers such as @chen2007law demonstrated that the relationship is mediated by the size of the upper chamber. Their finding suggests that the institutional design of the legislature influences the empirical predictions in the sample we study. To test this possibility, we estimated a subgroup analysis using a binary indicator for institutional design. The results may be seen below.
 
-## Upper House Size and Expenditure per Capita
+We find little evidence that either unicameral or non-unicameral legislative institutions produce systematically positive effects on expenditure per capita. However, the coefficients tend to be weakly positive for unicameral studies, suggesting that there might be a relationship, that is masked by the low statistical power.
 
-Now we look into the upper house size (*k*). In this model, we investigate the effect of upper house size on expenditure per capita (ExpPC).
+```{r, fig.width=8, fig.height=6, fig.cap="Subgroup Analysis of Lower Chamber Size x Expenditure Per Capita, Controlling by Institution Design", warning=FALSE, cache=TRUE, echo = FALSE}
+build_forest_het(aux, aux$coef, aux$VAR, slab = aux$authoryear,
+                 capt = NULL, hetvar = aux$instdesign2)
+```
+
+## Log of Lower Chamber Size and Expenditure Per Capita
+
+There are no studies that have per capita expenditure as the dependent variable and log of lower chamber size as the independent variable.
+
+## Upper House Size and Expenditure Per Capita
+
+Now we look into the upper chamber size. In this model, we investigate the effect of upper house size on expenditure per capita.
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 # Pooling effects analysis -- ExpPC x K
@@ -822,19 +834,19 @@ mod <- rma.mv(coef, VAR, data=aux,
 mod
 ```
 
-```{r, fig.width=7, fig.height=3, fig.cap="Effect of upper house size (K) on the per capita government expenditure (ExpPC)", warning=FALSE, echo = FALSE}
+```{r, fig.width=7, fig.height=3, fig.cap="Effect of Upper Chamber Size on Expenditure Per Capita", warning=FALSE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 We see no evidence of publication bias:
 
-```{r, fig.width=4, fig.height=3.5, fig.cap="Funnel Plot -- Effect of upper house size (K) on per capita government expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=3.5, fig.cap="Funnel Plot -- Effect of Upper Chamber Size on Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
 
 ```{r, include=FALSE, warning=FALSE, echo = FALSE}
-f2 <- build_forest(mod, NULL, 15, ttl = 'Upper Chamber Size\nand Expenditure Per Capita')
+f2 <- build_forest(mod, NULL, 15, ttl = '1.6 - Upper Chamber Size\nand Expenditure Per Capita')
 ```
 
 Highlights:
@@ -844,9 +856,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Lower House Size and Log Expenditure Per Capita
+## Lower Chamber Size and Log of Expenditure Per Capita
 
-This model estimates the Log of Per Capita Expenditure as the dependent variable, and the number of lower house legislators as the treatment variable.
+This model estimates the log of expenditure per capita as the dependent variable, and lower chamber size as the independent variable.
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 # Pooling effects analysis -- logExpPC x N
@@ -866,19 +878,19 @@ mod
 
 The forest plot is as follows:
 
-```{r, fig.width=8, fig.height=3, fig.cap="Effect of lower houses size (N) on log of per capita expenditure (logExpPC)",warning=FALSE, echo = FALSE, cache=TRUE}
+```{r, fig.width=8, fig.height=3, fig.cap="Effect of Lower Chamber Size on Log of Expenditure Per Capita",warning=FALSE, echo = FALSE, cache=TRUE}
 build_forest(mod, NULL)
 ```
 
 The funnel plot shows no evidence of publication bias.
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of lower houses size (N) on log of per capita expenditure (logExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Log Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
 
 ```{r,include=F, echo = FALSE, warning=F, cache=TRUE}
-f3 <- build_forest(mod, NULL, 15, ttl = 'Lower Chamber Size\nand Log Expenditure Per Capita')
+f3 <- build_forest(mod, NULL, 15, ttl = '1.2 - Lower Chamber Size\nand Log Expenditure Per Capita')
 ```
 
 Highlights:
@@ -888,9 +900,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Log of Lower House Size and Log of Expenditure Per Capita
+## Log of Lower Chamber Size and Log of Expenditure Per Capita
 
-In this specification, we study the log of per capita expenditure (logExpPC) as a function of the log of lower house size (logN).
+In this specification, we study the log of per capita expenditure as a function of the log of lower chamber size.
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 # Pooling effects analysis -- logExpPC x logN
@@ -909,19 +921,19 @@ mod
 
 The forest plot is available below:
 
-```{r, fig.width=6, fig.height=4, fig.cap="Effect of log lower houses size (logN) on the log of per capita government expenditure (logExpPC)", echo = FALSE, warning=FALSE, cache=TRUE}
+```{r, fig.width=6, fig.height=4, fig.cap="Effect of Log Lower Chamber Size on Log Expenditure Per Capita", echo = FALSE, warning=FALSE, cache=TRUE}
 build_forest(mod, NULL)
 ```
 
 The funnel plot:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of log lower houses size (N) on log of per capita government expenditure (logExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Log Lower Chamber Size on Log Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
 
 ```{r,include=F, echo = FALSE, warning=F, cache=TRUE}
-f4  <- build_forest(mod, NULL, 15, ttl = 'Log of Lower Chamber Size\nand Log of Expenditure Per Capita')
+f4  <- build_forest(mod, NULL, 15, ttl = '1.4 - Log Lower Chamber Size\nand Log Expenditure Per Capita')
 ```
 
 Highlights:
@@ -931,13 +943,13 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Upper House Size and Log of Expenditure Per Capita
+## Upper Chamber Size and Log of Expenditure Per Capita
 
-No studies correlate the log of per capita expenditure with the size of upper house (K).
+No studies correlate the log of per capita expenditure with the size of the upper chamber (K).
 
-## Lower House Size and Expenditure as Percentage of GDP
+## Lower Chamber Size and Expenditure as Percentage of GDP
 
-This model fits the random effects for the percentage of GDP as public expenditure as the main outcome, and the size of lower house as the treatment variable.
+This model fits the random effects for the percentage of GDP as public expenditure as the main outcome, and the size of lower house as the independent variable.
 
 ```{r, size="footnotesize", echo = FALSE, cache=TRUE}
 # Pooling effects analysis -- PCTGDP x N
@@ -956,18 +968,18 @@ mod
 
 Below, you may find the forest plot:
 
-```{r, fig.width=8, fig.height=3, fig.cap="Effect of lower houses size (N) on percentage of public expenditure GDP (PCTGDP)", warning=FALSE, echo = FALSE, cache=TRUE}
+```{r, fig.width=8, fig.height=3, fig.cap="Effect of Lower Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, echo = FALSE, cache=TRUE}
 build_forest(mod, NULL)
 ```
 
 The funnel plot to test for publication bias:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of lower houses size (N) on percentage of public expenditure GDP (PCTGDP)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
 ```{r, include=F, warning=F, echo = FALSE, cache=TRUE}
-f5 <- build_forest(mod, NULL, 15, ttl = 'Lower Chamber Size\nand Expenditure as Percentage of GDP')
+f5 <- build_forest(mod, NULL, 15, ttl = '1.3 - Lower Chamber Size\nand Expenditure as Percentage of GDP')
 ```
 
 Highlights:
@@ -977,9 +989,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Log Lower House Size and Expenditure as Percentage of GDP
+## Log Lower Chamber Size and Expenditure as Percentage of GDP
 
-This model investigates the percentage of GDP as public expenditure as the dependent variable and the log lower house size as the treatment variable.
+This model investigates the percentage of GDP as public expenditure as the dependent variable and the log lower chamber size as the independent variable.
 
 ```{r, echo = FALSE, size="footnotesize", cache=TRUE}
 # Pooling effects analysis -- PCTGDP x logN
@@ -997,19 +1009,18 @@ mod <- rma.mv(coef, VAR, data=aux,
 mod
 ```
 
-```{r, echo = FALSE, fig.width=8, fig.height=3, fig.cap="Effect of log lower houses size (logN) on the GDP share of public expenditure (PCTGDP)", warning=FALSE, cache=TRUE}
+```{r, echo = FALSE, fig.width=8, fig.height=3, fig.cap="Effect of Log Lower Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE}
 build_forest(mod, NULL)
 ```
 
 The funnel plot is available below:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of log lower houses size (N) on the GDP share of public expenditure (PCTGDP)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Log of Lower Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
-
 ```{r, include=F, warning=F, cache=TRUE, echo = FALSE}
-f6 <- build_forest(mod, NULL, 15, ttl = 'Log Lower Chamber Size\nand Expenditure as Percentage of GDP')
+f6 <- build_forest(mod, NULL, 15, ttl = '1.5 - Log Lower Chamber Size\nand Expenditure as Percentage of GDP')
 ```
 
 Highlights:
@@ -1019,9 +1030,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Upper House Size and Expenditure as Percentage of GDP
+## Upper Chamber Size and Expenditure as Percentage of GDP
 
-This model looks into the effect of upper house size (K) on the public expenditure share of the GDP (PCTGDP).
+This model looks into the effect of upper chamber size on the public expenditure share of the GDP.
 
 ```{r, size="footnotesize", cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- PCTGDP x K
@@ -1038,19 +1049,19 @@ mod <- rma.mv(coef, VAR, data=aux,
 mod
 ```
 
-```{r, fig.width=8, fig.height=4, fig.cap="Effect of upper house size (K) on the public expenditure share of the GDP (PCTGDP)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=4, fig.cap="Effect of Upper Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 As in our previous estimations, we find no evidence of file-drawer effect.
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of upper house size (K) on the public expenditure share of the GDP (PCTGDP)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Upper Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
 
 ```{r, include=F, warning=F, cache=TRUE, echo = FALSE}
-f7 <- build_forest(mod, NULL, 15, ttl = 'Upper Chamber Size\nand Expenditure as Percentage of GDP')
+f7 <- build_forest(mod, NULL, 15, ttl = '1.7 - Upper Chamber Size\nand Expenditure as Percentage of GDP')
 ```
 
 Highlights:
@@ -1060,7 +1071,7 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Lower House Size and Expenditure per Capita (IV)
+## Lower Chamber Size and Expenditure per Capita (Instrumental Variables Only)
 
 Here we estimate a meta-analysis of the papers which use instrumental variables. The results may be seen below.
 
@@ -1082,13 +1093,13 @@ mod
 
 And the forest plot:
 
-```{r, fig.width=8, fig.height=3, fig.cap="Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=3, fig.cap="Effect of Lower Chamber Size on Expenditure Per Capita (IV Only)", warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 No evidence of publication bias, as shown in the following funnel plot:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Expenditure Per Capita (IV Only)", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1121,9 +1132,9 @@ Highlights:
 
 ### Regression Method Subgroup Analysis
 
-Over time, the literature evolved to use causally identified techniques to determine the effect of legislature size on the expenduture per capita. To study whether the method had an effect on the estimated coefficients, we fit a subgroup analysis using the method employed in each paper.
+Over time, the literature evolved to use causally identified techniques to determine the effect of legislature size on the expenditure per capita. To study whether the method had an effect on the estimated coefficients, we fit a subgroup analysis using the method employed in each paper.
 
-```{r, fig.width=8, fig.height=6, fig.cap="Subgroup Analysis of (N) x (ExpPC), controlling by regression methods", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=6, fig.cap="Subgroup Analysis of Lower Chamber Size x Expenditure Per Capita, Controlling by Estimation Methods", warning=FALSE, cache=TRUE, echo = FALSE}
 aux <- dat %>%
   filter(indepvar2 == 'N',
          depvar2 == 'ExpPC')
@@ -1141,7 +1152,7 @@ build_forest_het(aux, aux$coef, aux$VAR, slab = aux$authoryear,
 
 Although all methods generate a null effect, the IV method seems to be well distributed, with two papers with positive effects and two papers displaying negative effects. The random effects model for the subgroup is 0.22, which is negative but non-significant. Improving the estimation technique, for the case of IVs, still renders a null effect of legislature size on per capita government expenditure.
 
-## Lower House Size and Log of Expenditure per Capita (RDD)
+## Lower Chamber Size and Log of Expenditure per Capita (Regression Discontinuity Design Only)
 
 In this subsection, we run a meta-analysis with papers that include regression discontinuity designs. 
 
@@ -1163,7 +1174,7 @@ mod
 
 Forest plot:
 
-```{r, fig.width=8, fig.height=3, fig.cap="Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=3, fig.cap="Effect of Lower Chamber Size on Expenditure Per Capita (RDD Only)", warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
@@ -1181,7 +1192,7 @@ mod <- rma.mv(coef, VAR, data=aux,
           method = "REML")
 
 f9 <- build_forest(mod, capt = NULL, 
-                       lsize = 15, ttl = 'Lower Chamber Size and Log of Expenditure per Capita\n(subgrouping by RDD)')
+                       lsize = 15, ttl = 'Lower Chamber Size and Log Expenditure per Capita\n(subgrouping by RDD)')
 ```
 
 Highlights:
@@ -1190,7 +1201,7 @@ Highlights:
 2.  The estimated SMD in the random effects model is $g =$ `r round(predict(mod)$pred,2)` ($SE =$ `r round(predict(mod)$se,3)`).
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
-5. One notable absence in the analysis is the seminar paper by @petterssonlidbom2012size. The reason is because in that paper, the author uses log of Expenditure Per Capita x Log of Legislature Size.
+5. One notable absence in the analysis is the seminar paper by @petterssonlidbom2012size. The reason is because in that paper, the author uses Log of Expenditure Per Capita x Log of Legislature Size.
 
 ```{r, warning=F, cache=TRUE, echo = FALSE, results='hide'}
 ## Plot 1
@@ -1205,9 +1216,9 @@ dev.off()
 
 # Meta-Analysis (All Coefficients)
 
-## Lower House Size and Expenditure Per Capita
+## Lower Chamber Size and Expenditure Per Capita
 
-Here we estimate the relationship between expenditure per capita as a dependent variable, and the lower house size as the independent variable.
+Here we estimate the relationship between expenditure per capita as a dependent variable, and the lower chamber as the independent variable.
 
 ```{r, size="footnotesize", warning=F, cache=T, echo = FALSE}
 # Pooling effects analysis -- ExpPC x N
@@ -1226,13 +1237,13 @@ mod
 
 The forest plot:
 
-```{r, fig.width=12, fig.height=11, fig.cap="Effect of Lower House Size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=12, fig.height=11, fig.cap="Effect of Lower Chamber Size on Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 And to assess the possibility of publication bias, we add the funnel plot below:
 
-```{r, fig.width=4, fig.height=3, fig.cap="Funnel Plot -- Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=3, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1249,18 +1260,29 @@ The *law of 1/n* was formulated to analyse the budgetary allocation in majoritar
 
 We see that majoritarian systems do not have a clear positive effect on budgetary spending. The majoritarian systems in the sample had a random effects model estimate of -0.25, while the random effects model in the non-majoritarian subgroup fitted a value of 0.08. Both are not statistically significant, but they reassure us that the absence of effect is not caused by pooling multiple types of electoral systems.
 
-```{r, fig.width=8, fig.height=12, fig.cap="Subgroup Analysis of (N) x (ExpPC), controlling by electoral system", warning=FALSE, cache=T, echo = FALSE}
+```{r, fig.width=8, fig.height=12, fig.cap="Subgroup Analysis of Lower Chamber Size x Expenditure Per Capita, Controlling by Electoral System", warning=FALSE, cache=T, echo = FALSE}
 build_forest_het(aux, aux$coef, aux$VAR, slab = aux$authoryear,
                  capt = NULL, hetvar = aux$elecsys2)
 ```
 
-## Log of Lower House Size and Expenditure Per Capita
+### Institution Design Subgroup Analysis
 
-There are no studies that have per capita expenditure as the dependent variable and log of lower house size as the treatment variable.
+The *law of 1/n* was conceived to explain the expected relationship that XXXX when increasing the chamber size. However, papers such as @chen2007law demonstrated that the relationship is mediated by the size of the upper chamber. Their finding suggests that the institutional design of the legislature influences the empirical predictions in the sample we study. To test this possibility, we estimated a subgroup analysis using a binary indicator for institutional design. The results may be seen below.
 
-## Upper House Size and Expenditure Per Capita
+We find little evidence that either unicameral or non-unicameral legislative institutions produce systematically positive effects on expenditure per capita. However, the coefficients tend to be weakly positive for unicameral studies, suggesting that there might be a relationship, that is masked by the low statistical power.
 
-Now we investigate the effect of the upper house size ($K$) on government spending. In the model below, we evaluate the relationship between upper house size and expenditure per capita (ExpPC).
+```{r, fig.width=8, fig.height=6, fig.cap="Subgroup Analysis of Lower Chamber Size x Expenditure Per Capita, Controlling by Institution Design", warning=FALSE, cache=TRUE, echo = FALSE}
+build_forest_het(aux, aux$coef, aux$VAR, slab = aux$authoryear,
+                 capt = NULL, hetvar = aux$instdesign2)
+```
+
+## Log of Lower Chamber Size and Expenditure Per Capita
+
+There are no studies that have per capita expenditure as the dependent variable and log of lower chamber size as the independent variable.
+
+## Upper Chamber Size and Expenditure Per Capita
+
+Now we investigate the effect of the upper chamber size on expenditure per capita.
 
 ```{r, size="footnotesize", warning=F, cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- ExpPC x K
@@ -1279,13 +1301,13 @@ mod
 
 The forest plot:
 
-```{r, fig.width=9, fig.height=10, fig.cap="Effect of upper house size (K) on the per capita government expenditure (ExpPC)",warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=9, fig.height=10, fig.cap="Effect of Upper Chamber Size on the Per Capita Government Expenditure",warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 The funnel plot suggests no publication bias.
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of upper houses size (K) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Upper Chamber Size on Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1296,9 +1318,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Lower House Size and Log of Expenditure Per Capita
+## Lower Chamber Size and Log of Expenditure Per Capita
 
-This model estimates the log of per capita expenditure as the dependent variable, and the number of lower house legislators as the treatment variable.
+This model estimates the log of per capita expenditure as the dependent variable, and the number of lower chamber legislators as the independent variable.
 
 ```{r, size="footnotesize", warning=F, cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- logExpPC x N
@@ -1317,11 +1339,11 @@ mod
 
 The forest plot is shown below:
 
-```{r, fig.width=8, fig.height=5, fig.cap="Effect of lower houses size (N) on log of per capita expenditure (logExpPC)",warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=5, fig.cap="Effect of Lower Chamber Size on Log Expenditure Per Capita",warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
-```{r, fig.width=4, fig.height=3, fig.cap="Funnel Plot -- Effect of lower houses size (N) on log of Per Capita Expenditure (logExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=3, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Log Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1332,9 +1354,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Log of Lower House Size and Log of Expenditure Per Capita
+## Log of Lower Chamber Size and Log of Expenditure Per Capita
 
-In this specification, we study the log of per capita expenditure (logExpPC) as a function of the log of lower house size (logN).
+In this specification, we study the log of per capita expenditure as a function of the log of lower chamber size.
 
 ```{r, size="footnotesize", warning=F, cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- logExpPC x logN
@@ -1353,13 +1375,13 @@ mod
 
 The forest plot:
 
-```{r, fig.width=8, fig.height=7, fig.cap="Effect of log lower houses size (logN) on the log of per capita government expenditure (logExpPC)",warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=7, fig.cap="Effect of Log of Lower Chamber Size on Log of Expenditure Per Capita",warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 And the funnel plot: 
 
-```{r, fig.width=4, fig.height=3.5, fig.cap="Funnel Plot -- Effect of log of lower houses size (logN) on log of Per Capita Expenditure (logExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=3.5, fig.cap="Funnel Plot -- Effect of Log of Lower Chamber Size on Log of Expenditure Per Capita", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1371,13 +1393,13 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Upper House Size and Log of Expenditure Per Capita
+## Upper Chamber Size and Log of Expenditure Per Capita
 
-No studies related the log of per capita expenditure with the size of upper house ($K$).
+No studies related the log of per capita expenditure with the size of upper chamber.
 
-## Lower House Size and Expenditure as Percentage of GDP
+## Lower Chamber Size and Expenditure as Percentage of GDP
 
-This model fits the random effects for the percentage of GDP as public expenditure as the main outcome, and the size of lower house as the treatment variable.
+This model fits the random effects for the percentage of GDP as public expenditure as the main outcome, and the size of lower chamber as the independent variable.
 
 ```{r, size="footnotesize", warning=F, cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- PCTGDP x N
@@ -1396,13 +1418,13 @@ mod
 
 Here is the forest plot:
 
-```{r, fig.width=8, fig.height=7, fig.cap="Effect of lower houses size (N) on percentage of public expenditure GDP (PCTGDP)",warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=7, fig.cap="Effect of Lower Chamber Size on Expenditure as Percentage of GDP",warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 And here is the funnel plot to assess the possibility of publication bias:
 
-```{r, fig.width=4, fig.height=3.75, fig.cap="Funnel Plot -- Effect of lower houses size (N) on percentage of public expenditure GDP (PCTGDP)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=3.75, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1414,9 +1436,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Log of Lower House Size and Expenditure as Percentage of GDP
+## Log of Lower Chamber Size and Expenditure as Percentage of GDP
 
-This meta-regression investigates the percentage of GDP as public expenditure as the dependent variable and the natural logarithm of lower house size (log($N$)) as the treatment variable.
+This meta-regression investigates the percentage of GDP as public expenditure as the dependent variable and the natural logarithm of lower chamber size as the independent variable.
 
 ```{r, size="footnotesize", warning=F, cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- PCTGDP x logN
@@ -1435,13 +1457,13 @@ mod
 
 The forest plot:
 
-```{r, fig.width=8, fig.height=3, fig.cap="Effect of log lower houses size (logN) on the GDP share of public expenditure (PCTGDP)",warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=3, fig.cap="Effect of Log Lower Chamber Size on Expenditure as Percentage of GDP",warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 And the funnel plot:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of log of lower houses size (logN) on log of Per Capita Expenditure (logExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Log Lower Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1453,9 +1475,9 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Upper House Size and Expenditure as Percentage of GDP
+## Upper Chamber Size and Expenditure as Percentage of GDP
 
-This model looks into the effect of upper house size ($K$) on the public expenditure share of the GDP (PCTGDP).
+This model looks into the effect of upper chamber size on the expenditure as a percentage of the GDP.
 
 ```{r, size="footnotesize", warning=F, cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- PCTGDP x K
@@ -1474,13 +1496,13 @@ mod
 
 And the forest plot:
 
-```{r, fig.width=8, fig.height=4, fig.cap="Effect of upper house size (K) on the public expenditure share of the GDP (PCTGDP)",warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=4, fig.cap="Effect of Upper Chamber Size on Expenditure as Percentage of GDP",warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 And to assess the possibility of publication bias, we add funnel plot below:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of upper houses size (K) on the public expenditure share of GDP (PCTGDP)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Upper Chamber Size on Expenditure as Percentage of GDP", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1492,7 +1514,7 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Lower House Size and Expenditure per Capita (IV)
+## Lower Chamber Size and Expenditure per Capita (Instrumental Variables Only)
 
 ```{r, size="footnotesize", cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- ExpPC x N (IV only)
@@ -1512,13 +1534,13 @@ mod
 
 And the forest plot:
 
-```{r, fig.width=8, fig.height=4, fig.cap="Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=4, fig.cap="Effect of Lower Chamber Size on Expenditure Per Capita (IV Only)", warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 And to assess the possibility of publication bias, we add funnel plot below:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of lower houses size (N) on Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Expenditure Per Capita (IV Only)", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1529,7 +1551,7 @@ Highlights:
 3.  The prediction interval ranges from `r round(predict(mod)$cr.lb,2)` to `r round(predict(mod)$cr.ub,2)`. Therefore, it `r ifelse(((predict(mod)$cr.lb)*(predict(mod)$cr.ub))>0,'does not emcompasses zero.','emcompasses zero.')`
 4. The @egger1997bias test `r ifelse(ranktest(mod)$pval<0.05, 'confirmed', 'rejected')` the hypothesis of publication bias.
 
-## Lower House Size and Log of Expenditure per Capita (RDD)
+## Lower Chamber Size and Log of Expenditure Per Capita (Regression Discontinuity Designs Only)
 
 ```{r, size="footnotesize", cache=TRUE, echo = FALSE}
 # Pooling effects analysis -- ExpPC x N
@@ -1549,13 +1571,13 @@ mod
 
 And the forest plot:
 
-```{r, fig.width=8, fig.height=4, fig.cap="Effect of lower houses size (N) on log of Per Capita Expenditure (logExpPC)",warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=8, fig.height=4, fig.cap="Effect of Lower Chamber Size on Log Expenditure Per Capita (RDD Only)",warning=FALSE, cache=TRUE, echo = FALSE}
 build_forest(mod, NULL)
 ```
 
 And to assess the possibility of publication bias, we add funnel plot below:
 
-```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of lower houses size (N) on log of Per Capita Expenditure (ExpPC)", warning=FALSE, cache=TRUE, echo = FALSE}
+```{r, fig.width=4, fig.height=4, fig.cap="Funnel Plot -- Effect of Lower Chamber Size on Log Expenditure Per Capita (RDD Only)", warning=FALSE, cache=TRUE, echo = FALSE}
 funnel(mod)
 ```
 
@@ -1572,9 +1594,9 @@ Highlights:
 In the meta-regressions, we study the effects of a group of moderators on the reported government spending data. We select the following moderators:
 
 1. The independent variable (variable `indepvar2`):
-  - `K`: Upper House Size
-  - `N`: Lower House Size
-  - `logN`: Log of Lower House Size
+  - `K`: Upper Chamber Size
+  - `N`: Lower Chamber Size
+  - `logN`: Log of Lower Chamber Size
   
 2. Year that the paper was published (for working papers, the year it was posted online; variable `year`)
 
@@ -1583,8 +1605,9 @@ In the meta-regressions, we study the effects of a group of moderators on the re
 4. A dummy for non-majoritarian electoral systems (variable `elecsys2`).
 
 5. A institution design variable, with:
- - `Unicameral` (e.g., US Municipalities)
- - `Non-unicameral`: (e.g. `Bicameral` or `Mixed`).
+ - `Bicameral`: a legislative system comprised of two chambers (e.g. US Federal Senate and House).
+ - `Unicameral`: a system with only a lower chamber (e.g. US Municipalities).
+ - `Mixed`: more than one system in the same sample (cross-country regressions).
 
 6. The estimation method used in the papers (variable `method`):
   - `OLS`: Ordinary-Least Squares in Cross-Sectional data.
@@ -1592,7 +1615,7 @@ In the meta-regressions, we study the effects of a group of moderators on the re
   - `IV`: Instrumental Variables models.
   - `RDD`: Regression Discontinuity Designs.
   
-The results follows below, for the three combinations of dependent variables: Expenditure Per Capita, Log of Expenditure Per Capita, and Expenditure as a Percentage of the GDP.
+The results follows below, for the three combinations of dependent variables: Expenditure Per Capita, Log of Expenditure Per Capita, and Expenditure as Percentage of GDP.
 
 ## Meta-Regressions for Expenditure Per Capita
 
@@ -1604,7 +1627,7 @@ mod <- rma.mv(yi = coef,
               data = dat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               sparse = TRUE,
               tdist = TRUE,
@@ -1622,7 +1645,7 @@ mod <- rma.mv(yi = coef,
               data = fulldat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
@@ -1631,13 +1654,14 @@ mod <- rma.mv(yi = coef,
 
 summary(mod)
 ```
+
 With all coefficients, the results of the effect sizes on the Expenditure Per Capita regressions are the following:
 
-1.  Compared with `K`, models with `N` tend to detect significantly smaller effects.
+1.  Compared with upper chamber size, models with lower chamber size tend to detect significantly smaller effects.
 
 2.  Year has now a positive effect on coefficient sizes.
 
-3.  All other moderators were not significant.
+3.  All other moderators were insignificant.
 
 ## Meta-Regressions for Log of Expenditure Per Capita
 
@@ -1647,7 +1671,7 @@ mod <- rma.mv(yi = coef,
               data = dat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
@@ -1667,7 +1691,7 @@ mod <- rma.mv(yi = coef,
               data = fulldat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
@@ -1677,9 +1701,9 @@ mod <- rma.mv(yi = coef,
 summary(mod)
 ```
 
-With all coefficients, results of the effect sizes on the Log of Expenditure Per Capita Regressions indicate that in regard to the estimation method, papers that use `PANEL` data or `RDD` designs have smaller effects than articles that employ `OLS` estimations. All other results are insignificant.
+With all coefficients, results of the effect sizes on the log of expenditure per capita regressions indicate that in regard to the estimation method, papers that use panel data or regression discontinuity designs have smaller effects than articles that employ simple OLS regressions. All other results are insignificant.
 
-## Meta-Regressions for Expenditure as a Percentage of the GDP
+## Meta-Regressions for Expenditure as a Percentage of GDP
 
 ```{r, size="footnotesize", warning=F, cache=T, echo = FALSE}
 mod <- rma.mv(yi = coef,
@@ -1687,7 +1711,7 @@ mod <- rma.mv(yi = coef,
               data = dat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
@@ -1711,7 +1735,7 @@ mod <- rma.mv(yi = coef,
               data = fulldat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
@@ -1729,13 +1753,13 @@ With all coefficients, the results of the effect sizes on the Expenditure as a P
 3. Papers whose samples included unicameral legislatures report significantly higher coefficients. 
 
 
-# Robustness: Meta-Regressions (All Coefficients)
+# Meta-Regressions (All Coefficients)
 
 In this section, we aggregate all the coefficients and run a multivariate meta-regression, controlling for:
 
-1. The type of the dependent variable in the study (expenditure per capita, log of the expenditure per capita, and share of government expenditure in the GDP).
+1. The type of the dependent variable in the study (expenditure per capita, log expenditure per capita, and expenditure as percentage of GDP).
 
-2. The type of the independent variable in the study (lower house size, upper house size, or log of lower house size).
+2. The type of the independent variable in the study (lower chamber size, upper chamber size, or log of lower chamber size).
 
 3. The electoral system (Majoritarian versus Non-Majoritarian).
 
@@ -1743,7 +1767,7 @@ In this section, we aggregate all the coefficients and run a multivariate meta-r
 
 5. Whether the study is a working paper or published work.
 
-6. The institutional design: whether the legislature in the analysis is unicameral or non-unicameral (bicameral or mixed).
+6. The institutional design: whether the legislature in the analysis is unicameral, bicameral, or mixed.
 
 7. The estimation method used in the paper (OLS, PANEL, IV, or RDD).
 
@@ -1755,7 +1779,7 @@ mod <- rma.mv(yi = coef,
               data = dat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
@@ -1763,6 +1787,7 @@ mod <- rma.mv(yi = coef,
 
 summary(mod)
 ```
+
 In the restricted model, with only the main coefficients in the selected papers, Unicameralism has a positive, significant effect. Also, papers using Regression Discontinuity Design tend to have a negative effect, significant at the 10% level. We also run the meta-regressions adding all coefficients in the papers. The results follow below:
 
 ```{r, size="footnotesize", warning=F, cache=T, echo = FALSE}
@@ -1771,7 +1796,7 @@ mod <- rma.mv(yi = coef,
               data = fulldat,
               method = "REML",
               random = ~ 1 | id_level1/id_level2, 
-              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign2,
+              mods = ~depvar2+indepvar2+year+published+elecsys2+method+instdesign,
               test = "knha",
               tdist = TRUE,
               sparse = TRUE,
